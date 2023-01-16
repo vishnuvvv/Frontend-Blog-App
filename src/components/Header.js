@@ -4,8 +4,10 @@ import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { authActions } from "../store";
+import { useStyles } from "./utils";
 
 const Header = () => {
+  const classes = useStyles
   const dispatch = useDispatch()
   const [value, setValue] = useState();
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
@@ -16,12 +18,12 @@ const Header = () => {
         position="sticky"
         sx={{
           background:
-            "linear-gradient(0deg, rgba(0,0,0,1) 0%, rgba(255,132,0,1) 100%)",
+            "#121212 ",
         }}
       >
         <Toolbar>
-          <Typography variant="h4" color="grey">
-            Blog app
+          <Typography className={classes.font} variant="h4" color="grey">
+            bloGeAt
           </Typography>
           <Box display="flex" marginLeft="auto" marginRight="auto">
             {isLoggedIn && (
@@ -30,8 +32,9 @@ const Header = () => {
                 value={value}
                 onChange={(e, val) => setValue(val)}
               >
-                <Tab LinkComponent={Link} to="/blogs" label="AllBlogs" />
-                <Tab LinkComponent={Link} to="/myBlogs" label="MyBlogs" />
+                <Tab className={classes.font} LinkComponent={Link} to="/blogs" label="AllBlogs" />
+                <Tab className={classes.font} LinkComponent={Link} to="/myBlogs" label="MyBlogs" />
+                <Tab className={classes.font} LinkComponent={Link} to="/blogs/add" label="Publish Blog" />
               </Tabs>
             )}
           </Box>
@@ -40,6 +43,7 @@ const Header = () => {
               <>
                 {" "}
                 <Button
+                  
                   LinkComponent={Link}
                   to="/auth"
                   variant="contained"
@@ -63,7 +67,7 @@ const Header = () => {
               <Button
                 onClick={()=>dispatch(authActions.logout())}
                 LinkComponent={Link}
-                to="/auth"
+                to="/"
                 variant="contained"
                 sx={{ margin: 1, borderRadius: 10 }}
                 color="warning"
