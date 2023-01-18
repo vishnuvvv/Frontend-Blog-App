@@ -1,7 +1,7 @@
 import { Button, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { authActions } from "../store";
@@ -12,6 +12,8 @@ const Auth = () => {
   const initialInputs = { name: "", email: "", password: "" };
   const [formInputs, setFormInputs] = useState(initialInputs);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
+  const [isSubmit, setIsSubmit] = useState(false);
 
   const handleChange = (e) => {
     e.preventDefault();
@@ -36,6 +38,8 @@ const Auth = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(formInputs);
+    setFormErrors(validate(formInputs));
+    setIsSubmit(true);
     //sendRequest();
 
     if (isSignUp) {
@@ -45,11 +49,44 @@ const Auth = () => {
         .then(() => navigate("/blogs"))
         .then((data) => console.log(data));
     } else {
-      sendRequest().then((data)=>localStorage.setItem("userId",data.user._id))
+      sendRequest()
+        .then((data) => localStorage.setItem("userId", data.user._id))
         .then(() => dispatch(authActions.login()))
         .then(() => navigate("/blogs"))
         .then((data) => console.log(data));
     }
+  };
+
+  useEffect(() => {
+    console.log(formErrors);
+    if (Object.keys(formErrors).length === 0 && isSubmit) {
+      console.log(formInputs);
+    }
+  }, [formErrors]);
+
+  const validate = (formInputs) => {
+    const errors = {};
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+
+    if (!formInputs.name) {
+      errors.name = "Name is required !";
+    }
+
+    if (!formInputs.email) {
+      errors.email = "Email is required !";
+    } else if (!regex.test(formInputs.email)) {
+      errors.email = "This is not a valid email format";
+    }
+
+    if (!formInputs.password) {
+      errors.password = "Password is required !";
+    } else if (formInputs.password.length < 6) {
+      errors.password = "Password must be more than 6 characters !";
+    } else if (formInputs.password.length > 12) {
+      errors.password = "Password can not exceed more than 12 characters !";
+    }
+
+    return errors;
   };
 
   return (
@@ -61,24 +98,31 @@ const Auth = () => {
           flexDirection="column"
           alignItems="center"
           justifyContent="center"
-          boxShadow="10px 10px 20px #ccc"
           padding={3}
           margin="auto"
           marginTop={5}
           borderRadius={5}
+          sx={{
+            boxShadow: "5px 5px 10px #ccc",
+          ":hover": { boxShadow: "10px 10px 20px #ccc" }
+          }}
         >
+
           <Typography padding={3} textAlign="center" variant="h2">
             {isSignUp ? "Signup" : "Signin "}
           </Typography>
           {isSignUp && (
-            <TextField
-              onChange={handleChange}
-              value={formInputs.name}
-              name="name"
-              placeholder="Name"
-              margin="normal"
-              sx={{ borderRadius: 2, boxShadow: "2px 2px 4px #ccc" }}
-            />
+            <>
+              <TextField
+                onChange={handleChange}
+                value={formInputs.name}
+                name="name"
+                placeholder="Name"
+                margin="normal"
+                sx={{ borderRadius: 2, boxShadow: "2px 2px 4px #ccc" }}
+              />
+              <p Style="color:red;">{formErrors.name}</p>
+            </>
           )}
           <TextField
             onChange={handleChange}
@@ -88,6 +132,8 @@ const Auth = () => {
             margin="normal"
             sx={{ borderRadius: 2, boxShadow: "2px 2px 4px #ccc" }}
           />
+          <p Style="color:red;">{formErrors.email}</p>
+
           <TextField
             type="password"
             onChange={handleChange}
@@ -97,6 +143,8 @@ const Auth = () => {
             margin="normal"
             sx={{ borderRadius: 2, boxShadow: "2px 2px 4px #ccc" }}
           />
+          <p Style="color:red;">{formErrors.password}</p>
+
           <Button
             sx={{
               borderRadius: 2,
