@@ -23,7 +23,7 @@ const Auth = () => {
 
   const sendRequest = async (type = "signin") => {
     const res = await axios
-      .post(`http://localhost:5000/api/user/${type}`, {
+      .post(`https://backend-blog-app7.onrender.com/api/user/${type}`, {
         name: formInputs.name,
         email: formInputs.email,
         password: formInputs.password,
